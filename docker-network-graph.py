@@ -8,7 +8,7 @@ import typing
 import urllib.parse
 from dataclasses import dataclass
 from graphviz import Graph
-from graphviz.parameters.formats import FORMATS
+from graphviz import FORMATS
 
 # colorlover.scales["12"]["qual"]["Paired"] converted to hex strings
 # Also some neutral colors from colormind.io
@@ -90,7 +90,7 @@ def get_networks(
     for net in sorted(client.networks.list(), key=lambda k: k.name):
         try:
             gateway = net.attrs["IPAM"]["Config"][0]["Subnet"]
-        except (KeyError, IndexError):
+        except (KeyError, IndexError, TypeError):
             # This network doesn't seem to be used, skip it
             continue
 
@@ -234,13 +234,13 @@ def generate_graph(verbose: bool, file: str, url: str):
             comment="Docker Network Graph",
             engine="sfdp",
             format=ext[1:],
-            graph_attr=dict(splines="true"),
+            graph_attr=dict(splines="true", rankdir="LR", bgcolor="transparent"),
         )
     else:
         g = Graph(
             comment="Docker Network Graph",
             engine="sfdp",
-            graph_attr=dict(splines="true"),
+            graph_attr=dict(splines="true", rankdir="LR", bgcolor="transparent"),
         )
 
     for _, network in networks.items():
